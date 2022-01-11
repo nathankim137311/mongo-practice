@@ -5,10 +5,6 @@ const Product = require('./models/Product');
 const bodyParser = require('body-parser');  
 require('dotenv').config(); 
 
-// Middleware
-app.use(bodyParser.json()); 
-app.use(bodyParser.urlencoded({ extended: false }));
-
 // Products
 const products = [
     {
@@ -28,29 +24,30 @@ const products = [
     }
 ];
 
+// Middleware
+app.use(bodyParser.json()); 
+app.use(bodyParser.urlencoded({ extended: false }));
+
 // Routes
 app.get('/', (req, res) => {
     res.send('Working with MongoDB');
 });
 
-app.post('/insertData', async (req, res) => {
-});
-
 const PORT = 8000; 
 
-// node 2.12.2 or later 
-// const URI = 'mongodb://root:SfYWTUk7yAk6Vrz@lego-starwars-api-shard-00-00.f3ig8.mongodb.net:27017,lego-starwars-api-shard-00-01.f3ig8.mongodb.net:27017,lego-starwars-api-shard-00-02.f3ig8.mongodb.net:27017/lego-starwars?ssl=true&replicaSet=atlas-euecfs-shard-0&authSource=admin&retryWrites=true&w=majority';
+mongoose.connect(process.env.DB_CONNECTION, async (uri) => {
+    console.log('successfully connected to MongoDB');
+    // This Code Works 
 
-mongoose.connect(process.env.DB_CONNECTION, async () => {
-    products.forEach(async (product) => {
-        const productData = await Product.create({
-            product_name: product.product_name,
-            item_id: product.item_id,
-            price: product.price,
-        });
+    // products.forEach(async (product) => {
+    //     const productData = await Product.create({
+    //         product_name: product.product_name,
+    //         item_id: product.item_id,
+    //         price: product.price,
+    //     });
 
-        await productData.save();
-    });
+    //     await productData.save();
+    // });
 });
 
 app.listen(PORT, () => console.log(`server is running on PORT ${PORT}...`));

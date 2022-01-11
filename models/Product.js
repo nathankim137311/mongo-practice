@@ -4,13 +4,35 @@ const Schema = mongoose.Schema;
 const product = new Schema(
   {
     product_name: {
-      type: String
+      type: String,
+      required: true,
     },
     item_id: {
-      type: String
+      type: Number, 
+      required: true, 
+    },
+    reviews: {
+      type: Number,
+    },
+    rating: {
+      type: Number,
+      max: 5,
+    },
+    availability: {
+      type: String, 
     },
     price: {
-      type: String
+      type: Number,
+      required: true, 
+    },
+    images: {
+      type: Array // or mixed 
+    },
+    ages: {
+      type: Number, // or mixed 
+    },
+    pieces: {
+      type: Number,
     }
   },
   { collection: "products" }
