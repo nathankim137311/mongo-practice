@@ -1,0 +1,35 @@
+// Restful API best practices // 
+
+// Prefix every route with /api
+    ex. /api/lego
+
+// Respond with status codes to provide feedback to the user 
+    1xx - for information
+    2xx - success 
+    3xx - redirection 
+    4xx - client-side errors 
+        ex. "user already exists" 
+    5xx - server-side errors 
+        ex. "internal server error" 
+
+// Allow filtering, sorting and pagination 
+difference between filtering and sorting: A filter is a list of conditions that each entry has to meet in order to be displayed. Sorting is the process of arrange data record in sequential or systematic order.
+
+// Only plurals for resource nouns 
+    ex. GET: /articles/
+            instead of 
+        GET: /article/ 
+    
+    this is because it is ambiguous for the user to determine if the request will 
+    return one article or all of the articles. So keep it consistent. 
+
+// General tips 
+    1. flat data is better and easier to use than nested data
+    2. choose either trailing '/' or no slash 
+        ex. POST: /entities 
+            POST: /entities/
+
+// Links 
+https://florimond.dev/en/posts/2018/08/restful-api-design-13-best-practices-to-make-your-users-happy/
+https://stackoverflow.blog/2020/03/02/best-practices-for-rest-api-design/
+https://restfulapi.net/rest-api-design-tutorial-with-example/

@@ -11,29 +11,19 @@ const product = new Schema(
       type: Number, 
       required: true, 
     },
-    reviews: {
-      type: Number,
-    },
+    reviews: Number,
     rating: {
       type: Number,
       max: 5,
     },
-    availability: {
-      type: String, 
-    },
+    availability: String, 
     price: {
       type: Number,
       required: true, 
     },
-    images: {
-      type: Array // or mixed 
-    },
-    ages: {
-      type: Number, // or mixed 
-    },
-    pieces: {
-      type: Number,
-    }
+    images: Array, 
+    ages: String,
+    pieces: Number,
   },
   { collection: "products" }
 );
