@@ -39,13 +39,22 @@ app.post('/insertData', async (req, res) => {
 const PORT = 8000; 
 
 mongoose.connect(`${process.env.DB_CONNECTION}`, async () => {
-    const product = await Product.create({
-        product_name: 'Darth Vader\'s Shuttle',
-        item_id: '13241234', 
-        price: '49.99',
+    products.forEach(async (product) => {
+        const productData = await Product.create({
+            product_name: product.product_name,
+            item_id: product.item_id,
+            price: product.price,
+        });
+
+        await productData.save();
     });
+    // const product = await Product.create({
+    //     product_name: 'Darth Vader\'s Shuttle',
+    //     item_id: '13241234', 
+    //     price: '49.99',
+    // });
     
-    await product.save();
+    // await product.save();
 });
 
 app.listen(PORT, () => console.log(`server is running on PORT ${PORT}...`));
