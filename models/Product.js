@@ -13,7 +13,7 @@ const product = new Schema(
       type: String
     }
   },
-  { collection: "Products" }
+  { collection: "products" }
 );
 
-module.exports = mongoose.model("Products", product);
+module.exports = mongoose.model("products", product);

@@ -38,7 +38,10 @@ app.post('/insertData', async (req, res) => {
 
 const PORT = 8000; 
 
-mongoose.connect(`${process.env.DB_CONNECTION}`, async () => {
+// node 2.12.2 or later 
+// const URI = 'mongodb://root:SfYWTUk7yAk6Vrz@lego-starwars-api-shard-00-00.f3ig8.mongodb.net:27017,lego-starwars-api-shard-00-01.f3ig8.mongodb.net:27017,lego-starwars-api-shard-00-02.f3ig8.mongodb.net:27017/lego-starwars?ssl=true&replicaSet=atlas-euecfs-shard-0&authSource=admin&retryWrites=true&w=majority';
+
+mongoose.connect(process.env.DB_CONNECTION, async () => {
     products.forEach(async (product) => {
         const productData = await Product.create({
             product_name: product.product_name,
@@ -48,13 +51,6 @@ mongoose.connect(`${process.env.DB_CONNECTION}`, async () => {
 
         await productData.save();
     });
-    // const product = await Product.create({
-    //     product_name: 'Darth Vader\'s Shuttle',
-    //     item_id: '13241234', 
-    //     price: '49.99',
-    // });
-    
-    // await product.save();
 });
 
 app.listen(PORT, () => console.log(`server is running on PORT ${PORT}...`));
