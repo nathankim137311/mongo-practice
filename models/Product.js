@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const product = new Schema(
   {
-    product_name: {
+    lego_set: {
       type: String,
       required: true,
     },

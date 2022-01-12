@@ -8,7 +8,7 @@ require('dotenv').config();
 // Products
 const products = [
     {
-        product_name: 'Darth Vader\'s Shuttle',
+        lego_set: 'Darth Vader\'s Shuttle',
         item_id: 13241234,
         reviews: 45, 
         rating: 3.5,
@@ -19,7 +19,7 @@ const products = [
         pieces: 345,
     },
     {
-        product_name: 'Palpatine\'s Toilet',
+        lego_set: 'Palpatine\'s Toilet',
         item_id: 45674567,
         reviews: 876,
         rating: 1.2, 
@@ -30,7 +30,7 @@ const products = [
         pieces: 12,  
     },
     {
-        product_name: 'Luke Skywalker\'s Left Shoe',
+        lego_set: 'Luke Skywalker\'s Left Shoe',
         item_id: 67896789,
         reviews: 1, 
         rating: 5,
@@ -41,8 +41,8 @@ const products = [
         pieces: 213, 
     }
 ];
-// router instance 
-const router = express.Router();              // get an instance of the express Router
+// Router instance 
+const router = express.Router();      
 
 // Middleware
 app.use(bodyParser.json()); 
@@ -50,91 +50,92 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/api', router); 
 
 // Routes
+// Get home 
 router.get('/', (req, res) => {
-    res.send('Welcome to our Lego Starwars Api!');
+    res.send('Welcome to our Lego Starwars Api!').sendStatus(200);
 });
 
-// filter products
-// app.get('/api/products', async (req, res) => {
-//     const { availability, reviews, rating, price, ages, pieces } = req.query; 
-//     if (availability) {
-//         const product = await Product.find({ availability: availability });
-//         try {
-//             res.send(product);
-//         } catch (error) {
-//             res.status(500).send(error);
-//         }
-//     }
-//     if (reviews) { // greater than
-//         const product = await Product.find({ reviews: { $gte: reviews } });
-//         try {
-//             res.send(product);
-//         } catch (error) {
-//             res.status(500).send(error);
-//         }
-//     }
-//     if (rating) { // greater than
-//         const product = await Product.find({ rating: { $gte: rating } });
-//         try {
-//             res.send(product);
-//         } catch (error) {
-//             res.status(500).send(error);
-//         }
-//     }
-//     if (price) {
-//         const product = await Product.find({ price: price });
-//         try {
-//             res.send(product);
-//         } catch (error) {
-//             res.status(500).send(error);
-//         }
-//     }
-//     if (ages) { // need to encode plus sign '%2B' greater than
-//         const product = await Product.find({ ages: { $gte: ages } });
-//         try {
-//             res.send(product);
-//         } catch (error) {
-//             res.status(500).send(error);
-//         }
-//     }
-//     if (pieces) {
-//         const product = await Product.find({ pieces: { $gte: pieces } });
-//         try {
-//             res.send(product);
-//         } catch (error) {
-//             res.status(500).send(error);
-//         }
-//     }
-//     if (availability === undefined && reviews === undefined && rating === undefined && price === undefined && ages === undefined && pieces === undefined) {
-//         const products = await Product.find(req.query);
-    
-//         try {
-//         res.send(products);
-//         } catch (error) {
-//         res.status(500).send(error);
-//         }
-//     }
-// });
+// Get products
+router.get('/products', async (req, res) => {
+    // if req.query object is empty 
+    if (Object.keys(req.query).length === 0) {
+        const products = await Product.find({}); // find all products
 
-// find specific item by id 
-// app.get('/api/products/:item_id', async (req, res) => {
-//     const item_id = req.params.item_id; 
-//     console.log(item_id);
-//     const product = await Product.find({ item_id = item_id });
-//     try {
-//         res.send(product);
-//     } catch (error) {
-//         res.status(500).send(error);
-//     }
-// });
+        try {
+            res.send(products).sendStatus(200);
+        } catch (error) {
+            res.status(500).send(error);
+        }   
+    } 
+    if (req.query.page && req.query.limit) { // find all products with pagination
+        const field = {}; 
+        paginatedResults(field, req, res);
+    }
+});
+
+// Get one product 
+router.get('/products/:item_id', async (req, res) => {
+    const item_id = req.params.item_id;
+    const products = await Product.find({ item_id: item_id});
+
+    try {
+        res.send(products).sendStatus(200);
+    } catch (error) {
+        res.status(500).send(error);
+    }  
+}); 
+
+// For invalid routes
+app.get('*', (req, res) => {
+    res.send('404! Page not found').sendStatus(404);
+});
+
+async function paginatedResults(field, req, res) {
+    const products = await Product.find(field);
+
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit); 
+
+    const startIndex = (page - 1) * limit; 
+    const endIndex = page * limit; 
+
+    const results = {};
+
+    if (endIndex < products.length) {
+        results.next = {
+            page: page + 1,
+            limit: limit,
+        } 
+    }
+
+    if (startIndex > 0) {
+        results.prev = {
+            page: page - 1,
+            limit: limit,
+        }
+    }
+
+    results.products = products.slice(startIndex, endIndex); 
+    res.send(results); 
+}
 
 const PORT = 8000; 
 
 mongoose.connect(process.env.DB_CONNECTION, async (uri) => {
     console.log('successfully connected to MongoDB');
+    const db = mongoose.connection
+    db.once('open', async () => {
+    if (await User.countDocuments().exec() > 0) return
+        User.create({})
+        Promise.all([
+            User.create({ name: 'User 1' }),
+            User.create({ name: 'User 2' }),
+            User.create({ name: 'User 3' }),
+        ]).then(() => console.log('Added Users'))
+    });
     // products.forEach(async (product) => {
     //     const productData = await Product.create({
-    //         product_name: product.product_name,
+    //         lego_set: product.lego_set,
     //         item_id: product.item_id,
     //         reviews: product.reviews,
     //         rating: product.rating,
