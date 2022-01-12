@@ -41,85 +41,92 @@ const products = [
         pieces: 213, 
     }
 ];
+// router instance 
+const router = express.Router();              // get an instance of the express Router
 
 // Middleware
 app.use(bodyParser.json()); 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use('/api', router); 
 
 // Routes
-app.get('/', (req, res) => {
-    res.send('Working with MongoDB');
+router.get('/', (req, res) => {
+    res.send('Welcome to our Lego Starwars Api!');
 });
 
 // filter products
-app.get('/api/products', async (req, res) => {
-    const { item_id, availability, reviews, rating, price, ages, pieces } = req.query; 
-    if (item_id) {
-        const product = await Product.find({ item_id: item_id });
-        try {
-            res.send(product);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-    if (availability) {
-        const product = await Product.find({ availability: availability });
-        try {
-            res.send(product);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-    if (reviews) { // greater than
-        const product = await Product.find({ reviews: { $gte: reviews } });
-        try {
-            res.send(product);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-    if (rating) { // greater than
-        const product = await Product.find({ rating: { $gte: rating } });
-        try {
-            res.send(product);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-    if (price) {
-        const product = await Product.find({ price: price });
-        try {
-            res.send(product);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-    if (ages) { // need to encode plus sign '%2B' greater than
-        const product = await Product.find({ ages: { $gte: ages } });
-        try {
-            res.send(product);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-    if (pieces) {
-        const product = await Product.find({ pieces: { $gte: pieces } });
-        try {
-            res.send(product);
-        } catch (error) {
-            res.status(500).send(error);
-        }
-    }
-    if (item_id === undefined && availability === undefined && reviews === undefined && rating === undefined && price === undefined && ages === undefined && pieces === undefined) {
-        const products = await Product.find(req.query);
+// app.get('/api/products', async (req, res) => {
+//     const { availability, reviews, rating, price, ages, pieces } = req.query; 
+//     if (availability) {
+//         const product = await Product.find({ availability: availability });
+//         try {
+//             res.send(product);
+//         } catch (error) {
+//             res.status(500).send(error);
+//         }
+//     }
+//     if (reviews) { // greater than
+//         const product = await Product.find({ reviews: { $gte: reviews } });
+//         try {
+//             res.send(product);
+//         } catch (error) {
+//             res.status(500).send(error);
+//         }
+//     }
+//     if (rating) { // greater than
+//         const product = await Product.find({ rating: { $gte: rating } });
+//         try {
+//             res.send(product);
+//         } catch (error) {
+//             res.status(500).send(error);
+//         }
+//     }
+//     if (price) {
+//         const product = await Product.find({ price: price });
+//         try {
+//             res.send(product);
+//         } catch (error) {
+//             res.status(500).send(error);
+//         }
+//     }
+//     if (ages) { // need to encode plus sign '%2B' greater than
+//         const product = await Product.find({ ages: { $gte: ages } });
+//         try {
+//             res.send(product);
+//         } catch (error) {
+//             res.status(500).send(error);
+//         }
+//     }
+//     if (pieces) {
+//         const product = await Product.find({ pieces: { $gte: pieces } });
+//         try {
+//             res.send(product);
+//         } catch (error) {
+//             res.status(500).send(error);
+//         }
+//     }
+//     if (availability === undefined && reviews === undefined && rating === undefined && price === undefined && ages === undefined && pieces === undefined) {
+//         const products = await Product.find(req.query);
     
-        try {
-        res.send(products);
-        } catch (error) {
-        res.status(500).send(error);
-        }
-    }
-});
+//         try {
+//         res.send(products);
+//         } catch (error) {
+//         res.status(500).send(error);
+//         }
+//     }
+// });
+
+// find specific item by id 
+// app.get('/api/products/:item_id', async (req, res) => {
+//     const item_id = req.params.item_id; 
+//     console.log(item_id);
+//     const product = await Product.find({ item_id = item_id });
+//     try {
+//         res.send(product);
+//     } catch (error) {
+//         res.status(500).send(error);
+//     }
+// });
 
 const PORT = 8000; 
 
