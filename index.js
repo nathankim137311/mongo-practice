@@ -51,20 +51,9 @@ app.get('/', (req, res) => {
     res.send('Working with MongoDB');
 });
 
-// get all products
-// app.get('/api/products', async (req, res) => {
-//     const products = await Product.find({});
-  
-//     try {
-//       res.send(products);
-//     } catch (error) {
-//       res.status(500).send(error);
-//     }
-// });
-
 // filter products
 app.get('/api/products', async (req, res) => {
-    const { item_id, availability, reviews, rating, price, ages, pieces } = req.query;
+    const { item_id, availability, reviews, rating, price, ages, pieces } = req.query; 
     if (item_id) {
         const product = await Product.find({ item_id: item_id });
         try {
@@ -81,7 +70,7 @@ app.get('/api/products', async (req, res) => {
             res.status(500).send(error);
         }
     }
-    if (reviews) {
+    if (reviews) { // greater than
         const product = await Product.find({ reviews: { $gte: reviews } });
         try {
             res.send(product);
@@ -89,8 +78,8 @@ app.get('/api/products', async (req, res) => {
             res.status(500).send(error);
         }
     }
-    if (rating) {
-        const product = await Product.find({ rating: rating });
+    if (rating) { // greater than
+        const product = await Product.find({ rating: { $gte: rating } });
         try {
             res.send(product);
         } catch (error) {
@@ -105,8 +94,8 @@ app.get('/api/products', async (req, res) => {
             res.status(500).send(error);
         }
     }
-    if (ages) { // need to encode plus sign '%2B'
-        const product = await Product.find({ ages: ages });
+    if (ages) { // need to encode plus sign '%2B' greater than
+        const product = await Product.find({ ages: { $gte: ages } });
         try {
             res.send(product);
         } catch (error) {
@@ -114,11 +103,20 @@ app.get('/api/products', async (req, res) => {
         }
     }
     if (pieces) {
-        const product = await Product.find({ pieces: pieces });
+        const product = await Product.find({ pieces: { $gte: pieces } });
         try {
             res.send(product);
         } catch (error) {
             res.status(500).send(error);
+        }
+    }
+    if (item_id === undefined && availability === undefined && reviews === undefined && rating === undefined && price === undefined && ages === undefined && pieces === undefined) {
+        const products = await Product.find(req.query);
+    
+        try {
+        res.send(products);
+        } catch (error) {
+        res.status(500).send(error);
         }
     }
 });
