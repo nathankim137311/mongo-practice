@@ -71,6 +71,7 @@ router.get('/products', async (req, res) => {
         const field = {}; 
         paginatedResults(field, req, res);
     } 
+    // filter products 
     if (req.query.availability) {
         const availability = req.query.availability;  
         // case insensitive search 
