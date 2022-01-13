@@ -60,9 +60,9 @@ router.get('/products', async (req, res) => {
     // if req.query object is empty 
     if (Object.keys(req.query).length === 0) {
         const products = await Product.find({}); // find all products
-
         try {
-            res.send(products).sendStatus(200);
+            if (products.length === 0) return res.send('products not found').status(404); 
+            res.send(products).status(200);
         } catch (error) {
             res.status(500).send(error);
         }   
@@ -70,6 +70,30 @@ router.get('/products', async (req, res) => {
     if (req.query.page && req.query.limit) { // find all products with pagination
         const field = {}; 
         paginatedResults(field, req, res);
+    } 
+    if (req.query.availability) {
+        const availability = req.query.availability;  
+        // case insensitive search 
+        const products = await Product.find({ availability: availability}).collation(
+          { locale: 'en', strength: 2 }
+        );
+
+        try {
+            if (products.length === 0) return res.status(404).send(`The products with availability "${availability}" was not found`); 
+            res.send(products).status(200); 
+        } catch(err) {
+            res.status(500).send(err);
+        }
+    }
+    if (req.query.price) {
+        const price = req.query.price;  
+        const products = await Product.find({ price: price});
+        try {
+            if (products.length === 0) return res.status(404).send(`The products with price "${price}" was not found`); 
+            res.send(products).status(200); 
+        } catch(err) {
+            res.status(500).send(err);
+        }
     }
 });
 
@@ -78,8 +102,9 @@ router.get('/products/:item_id', async (req, res) => {
     const item_id = req.params.item_id;
     const products = await Product.find({ item_id: item_id});
 
-    try {
-        res.send(products).sendStatus(200);
+    try { // sendStatus method is both status() and send() in one request
+        if (products.length === 0) return res.status(404).send('The product with the given ID was not found'); 
+        res.send(products).status(200);
     } catch (error) {
         res.status(500).send(error);
     }  
@@ -87,7 +112,7 @@ router.get('/products/:item_id', async (req, res) => {
 
 // For invalid routes
 app.get('*', (req, res) => {
-    res.send('404! Page not found').sendStatus(404);
+    res.send('404! Page not found').status(404);
 });
 
 async function paginatedResults(field, req, res) {
@@ -119,35 +144,31 @@ async function paginatedResults(field, req, res) {
     res.send(results); 
 }
 
-const PORT = 8000; 
+// Connect to MongoDB 
+mongoose.connect(process.env.DB_CONNECTION, async () => console.log('successfully connected to MongoDB'));
 
-mongoose.connect(process.env.DB_CONNECTION, async (uri) => {
-    console.log('successfully connected to MongoDB');
-    const db = mongoose.connection
-    db.once('open', async () => {
-    if (await User.countDocuments().exec() > 0) return
-        User.create({})
-        Promise.all([
-            User.create({ name: 'User 1' }),
-            User.create({ name: 'User 2' }),
-            User.create({ name: 'User 3' }),
-        ]).then(() => console.log('Added Users'))
+// Insert initial data 
+const db = mongoose.connection; 
+db.once('open', async () => {
+    if (await Product.countDocuments().exec() > 0) return 
+    products.forEach(async (product) => {
+        const productData = await Product.create({
+            lego_set: product.lego_set,
+            item_id: product.item_id,
+            reviews: product.reviews,
+            rating: product.rating,
+            availability: product.availability, 
+            price: product.price,
+            images: product.images,
+            ages: product.ages,
+            pieces: product.pieces,
+        });
+
+        await productData.save();
     });
-    // products.forEach(async (product) => {
-    //     const productData = await Product.create({
-    //         lego_set: product.lego_set,
-    //         item_id: product.item_id,
-    //         reviews: product.reviews,
-    //         rating: product.rating,
-    //         availability: product.availability,
-    //         price: product.price,
-    //         images: product.images,
-    //         ages: product.ages,
-    //         pieces: product.pieces,
-    //     });
-
-    //     await productData.save();
-    // });
+    console.log('Products inserted!');
 });
+
+const PORT = 8000; 
 
 app.listen(PORT, () => console.log(`server is running on PORT ${PORT}...`));
